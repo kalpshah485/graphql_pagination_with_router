@@ -3,7 +3,7 @@ import {
   useLazyQuery,
   // useQuery
 } from '@apollo/client';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useParams } from 'react-router-dom';
 import Pagination from '../components/Pagination';
 
@@ -28,37 +28,44 @@ const GET_CHARACTERS = gql`
 
 function Characters() {
   const { page_num } = useParams();
+  const getPageNum = () => {
+    return Number(page_num);
+  }
+  // const oldpagenum = useMemo(() => {console.log("memo: ", page_num);return page_num},[]);
   console.log("page number:", page_num);
-  const [data, setData] = useState();
-  const [getCharacters, { called, loading, error }] = useLazyQuery(GET_CHARACTERS);
-  // const { loading, error } = useQuery(
+  // const [data, setData] = useState();
+  const [getCharacters, { data, loading, error }] = useLazyQuery(GET_CHARACTERS);
+  // const { loading, data, error, refetch } = useQuery(
   //   GET_CHARACTERS, {
   //   variables: {
-  //     page_num: Number(page_num)
+  //     page_num: getPageNum()
   //   },
-  //   onCompleted: (data) => {
-  //     setData(data);
-  //   }
+  //   onError: error => console.log(error.message),
+  //   // onCompleted: (data) => {
+  //   //   setData(data);
+  //   // }
   // });
   useEffect(() => {
     getCharacters({
       variables: {
         page_num: Number(page_num)
       }
-    }).then(data => setData(data.data)).catch(error => console.log(error))
-  }, [getCharacters, page_num]);
+    })
+  }, [page_num]);
   // useEffect(() => {
-  //   console.log("mounted");
-  //   refetch({
-  //     page_num: Number(page_num)
-  //   })
-  //   return () => {
-  //     console.log("unmounted")
+  //   console.log("mounted",oldpagenum !== page_num);
+  //   if (oldpagenum !== page_num) {
+  //     console.log("it worked",oldpagenum,page_num);
+  //     refetch({
+  //       page_num: Number(page_num)
+  //     })
+  //     console.log("finished");
   //   }
   // }, [page_num, refetch])
 
   console.log(
-    called, 
+    // called, 
+    error,
     loading,
     data
   );
@@ -67,7 +74,9 @@ function Characters() {
       <h1>Loading...</h1>
     )
   }
-  if (called && error) {
+  if (
+    // called && 
+    error) {
     return (
       <p>Failed to load.... </p>
     )
