@@ -10,7 +10,7 @@ function Pagination({ page_info }) {
         prev
       </button>
       {
-        Array.from({length: page_info.pages}).map((_item, index) => <PageItem key={index+1} page_info={page_info} value={index+1}/>)
+        Array.from({ length: page_info.pages }).map((_item, index) => <PageItem key={index + 1} page_info={page_info} value={index + 1} />)
       }
       <button onClick={() => navigate(`/${page_info.next}`)} disabled={!page_info.next}>
         next
